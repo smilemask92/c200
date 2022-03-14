@@ -4,6 +4,9 @@ class stack:
     def __init__(self):
         self.s = []
 
+    def __str__(self):
+        return str(self.s)
+
     def pop(self):
         top = self.s[0]
         self.s = self.s[1:]
@@ -22,23 +25,23 @@ class stack:
     def peek(self):
         return self.s[0] if len(self.s) else None
         
-    def __str__(self):
-        return str(self.s)
-        
 class calc:
     def __init__(self):
         self.s = stack()
+
+    def __str__(self):
+        return str(self.s)
 
     def _op1(self,f):
         # f is a function that takes one operand
         # apply f to top item in stack.  
         # in the event of an exception, leave the
         # stack unchanged and pass the exception on
-        if len(self.s.s) < 1:
+        if len(self.s.s) <= 0:
             ierror = IndexError("list index out of range")
             raise(ierror)
+        n1 = self.s.pop()
         try:
-            n1 = self.s.pop()
             number = f(n1)
             self.s.push(number)
             return number
@@ -46,20 +49,19 @@ class calc:
             self.push(n1)
             raise(verror)
 
-
-
     def _op2(self,f):
         # f is a function that takes two operands
-        # apply f to top two items in stack.  top 
-        # element is first argument, second element is second argument
+        # apply f to top two items in stack. 
+        # top element is first argument, second element is second argument
         # in the event of an exception, leave the
         # stack unchanged and pass the exception on
         if len(self.s.s) < 2:
             ierror = IndexError("list index out of range")
             raise(ierror)
-        try:
+        else:
             n1 = self.s.pop()
             n2 = self.s.pop()
+        try:
             number = f(n1, n2)
             self.s.push(number) #class여서 self 생략
             return number
@@ -116,12 +118,11 @@ class calc:
         return self._op2(lambda x,y : y ** x)
     
     def push(self,data):
-        # push float(data) onto stack
-        self.s.push(data) #calling stack push
+        self.s.push(data)
 
     def work(self,data):
         try:
-            if data == 'c': #clear 다지워 empty list 만들기
+            if data == 'c': #clear all. Make it as empty list
                 self.clear()
                 return "Starting new computation"
             elif data == 'e':
@@ -138,21 +139,24 @@ class calc:
                 return str(self.div())
             elif data == '^':
                 return str(self.exp())
-            else:
+            elif data == 'show':
+                return str(self)
+            else: # if it is not a operend
                 str(self.push(data))
-        except Exception as e:
-            return str(e)
+        except Exception as err:
+            return str(err)
     
-    def __str__(self):
-        return str(self.s)
+
 
 if __name__ == "__main__":
-    i = 0 #시도, 번호
-    w = calc() #칼큘레이터는 w라는 오브젝트 만듦
-    while True:
+    # at the beginning, create calc object,
+    # and then calc object will create stack object
+    w = calc() 
+    i = 0 # trial number
+    while True: # while not pressing 'q'
         # uncomment the following to help debugging
         # print(w)
-        data = input(f"{i}: ").strip()
+        data = input(f"[{i}]: ").strip()
         if data == 'q':
             print('Terminated')
             break
@@ -160,4 +164,4 @@ if __name__ == "__main__":
             result = w.work(data)
             if result != None:
                 print(result)
-        i = 0 if data == 'c' else i+1   
+        i = 0 if data == 'c' else i+1
